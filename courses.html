@@ -1,0 +1,363 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Courses - Learn Portuguese with Isabel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo"><a href="index.html"><img src="images/lpwilogo.png" alt="Learn Portuguese with Isabel" style="height: 140px; width: auto;"></a></div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Welcome</a></li>
+                    <li><a href="courses.html" class="active">Courses</a></li>
+                    <li><a href="private-tutoring.html">Private Tutoring</a></li>
+                    <li><a href="account.html">Account</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li id="authNavItem">
+                        <a href="signin.html" class="btn btn-signin">Sign In</a>
+                    </li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Page Header -->
+    <section class="page-header">
+        <div class="container">
+            <h1>Our Courses</h1>
+            <p>Comprehensive Portuguese language courses for every level</p>
+        </div>
+    </section>
+
+    <!-- Courses Section -->
+    <section class="courses-page">
+        <div class="container">
+            <div class="courses-list" id="coursesList">
+                <!-- Courses will be loaded dynamically -->
+                <div class="loading-message" id="loadingMessage" style="display: none;"></div>
+                <!-- Static courses (fallback if database not configured) -->
+                <div id="staticCourses">
+                <!-- Hello Starter Bundle -->
+                <div class="course-detail-card">
+                    <div class="course-detail-header">
+                        <div class="course-level-badge beginner">Beginner</div>
+                        <h2>Hello Starter Bundle</h2>
+                    </div>
+                    <div class="course-detail-content">
+                        <div class="course-info">
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                                <span>8 Lessons</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <span>Lifetime Access</span>
+                            </div>
+                        </div>
+                        <div class="course-description">
+                            <div class="course-tabs">
+                                <div class="tab-buttons">
+                                    <button class="tab-btn active" data-tab="hello-overview">Overview</button>
+                                    <button class="tab-btn" data-tab="hello-curriculum">Curriculum</button>
+                                </div>
+                                <div class="tab-content">
+                                    <div class="tab-pane active" id="hello-overview">
+                                        <p>This bundle focuses on <strong>essential greetings, introductions, and foundational grammar</strong> to get you started with Portuguese. Perfect for absolute beginners who want to build a solid foundation.</p>
+                                        <h4>In this bundle, you will:</h4>
+                                        <ul>
+                                            <li>Essential greetings and introductions</li>
+                                            <li>Adjectives - describing people, places, and things</li>
+                                            <li>Prepositions - understanding spatial and temporal relationships</li>
+                                            <li>Basic conversation skills</li>
+                                            <li>Practical vocabulary for travel and daily life</li>
+                                        </ul>
+                                        <p>This bundle is perfect for learners who want to <strong>start their Portuguese journey</strong> with confidence and build a strong foundation for future learning.</p>
+                                    </div>
+                                    <div class="tab-pane" id="hello-curriculum">
+                                        <h4>Course Curriculum</h4>
+                                        <ul>
+                                            <li>Lesson 1 - Personal Names, Countries & Adjectives</li>
+                                            <li>Lesson 2 - Adjectives & Everyday Vocabulary (É, E, Mas) – Building Short Sentences</li>
+                                            <li>Lesson 3 - Greetings & First Conversations (É / Está, Tudo bem?, Como está?)</li>
+                                            <li>Lesson 4 - Talking About Time & Daily Context (Hoje, Amanhã, Counting to 12, Temos/Tenho)</li>
+                                            <li>Lesson 5 - Places & Drinks Vocabulary (In, On, At – Café, Bica, Caneca, Fino, Cerveja)</li>
+                                            <li>Lesson 6 - Days of the Week & Expressing Existence (Há – There Is / There Are)</li>
+                                            <li>Lesson 7 - Months & Seasons of the Year</li>
+                                            <li>Lesson 8 - Demonstratives & Everyday Expressions (Este, Esta, Isto, Chega, Não chega, Quero mais)</li>
+                                        </ul>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="course-price">
+                            <span class="price">€49.00</span>
+                            <a href="signup.html" class="btn btn-primary">Enroll Now</a>
+                        </div>
+                    </div>
+                </div>
+                <!-- Course 1 -->
+                <div class="course-detail-card">
+                    <div class="course-detail-header">
+                        <div class="course-level-badge beginner">Beginner</div>
+                        <h2>Portuguese Basics - Complete Beginner Course</h2>
+                    </div>
+                    <div class="course-detail-content">
+                        <div class="course-info">
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                                <span>50+ Video Lessons</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <span>10+ Hours of Content</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                </svg>
+                                <span>Lifetime Access</span>
+                            </div>
+                        </div>
+                        <div class="course-description">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>Portuguese alphabet and pronunciation</li>
+                                <li>Basic grammar rules and sentence structure</li>
+                                <li>Essential vocabulary for everyday conversations</li>
+                                <li>Greetings, introductions, and common phrases</li>
+                                <li>Numbers, time, dates, and basic expressions</li>
+                                <li>Present tense verbs and conjugations</li>
+                            </ul>
+                        </div>
+                        <div class="course-price">
+                            <span class="price">$99</span>
+                            <a href="contact.html" class="btn btn-primary">Enroll Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course 2 -->
+                <div class="course-detail-card featured">
+                    <div class="course-detail-header">
+                        <div class="course-level-badge intermediate">Intermediate</div>
+                        <h2>Intermediate Portuguese - Build Your Fluency</h2>
+                    </div>
+                    <div class="course-detail-content">
+                        <div class="course-info">
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                                <span>75+ Video Lessons</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <span>15+ Hours of Content</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                </svg>
+                                <span>Lifetime Access</span>
+                            </div>
+                        </div>
+                        <div class="course-description">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>Past and future tenses</li>
+                                <li>Complex grammar structures</li>
+                                <li>Idiomatic expressions and colloquialisms</li>
+                                <li>Conversation practice and fluency building</li>
+                                <li>Reading comprehension and writing skills</li>
+                                <li>Cultural insights and context</li>
+                            </ul>
+                        </div>
+                        <div class="course-price">
+                            <span class="price">$149</span>
+                            <a href="contact.html" class="btn btn-primary">Enroll Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course 3 -->
+                <div class="course-detail-card">
+                    <div class="course-detail-header">
+                        <div class="course-level-badge advanced">Advanced</div>
+                        <h2>Advanced Portuguese - Master Fluency</h2>
+                    </div>
+                    <div class="course-detail-content">
+                        <div class="course-info">
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                                <span>100+ Video Lessons</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <span>20+ Hours of Content</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                </svg>
+                                <span>Lifetime Access + Certificate</span>
+                            </div>
+                        </div>
+                        <div class="course-description">
+                            <h3>What You'll Learn</h3>
+                            <ul>
+                                <li>Advanced grammar and syntax</li>
+                                <li>Business Portuguese and professional communication</li>
+                                <li>Literary analysis and academic writing</li>
+                                <li>Regional variations and dialects</li>
+                                <li>Complex idiomatic expressions</li>
+                                <li>Certification upon completion</li>
+                            </ul>
+                        </div>
+                        <div class="course-price">
+                            <span class="price">$199</span>
+                            <a href="contact.html" class="btn btn-primary">Enroll Now</a>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Course Bundle -->
+                <div class="course-detail-card bundle">
+                    <div class="course-detail-header">
+                        <div class="course-level-badge bundle-badge">Best Value</div>
+                        <h2>Complete Portuguese Bundle - All Levels</h2>
+                    </div>
+                    <div class="course-detail-content">
+                        <div class="course-info">
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <rect x="2" y="3" width="20" height="14" rx="2" ry="2"/>
+                                    <line x1="8" y1="21" x2="16" y2="21"/>
+                                    <line x1="12" y1="17" x2="12" y2="21"/>
+                                </svg>
+                                <span>225+ Video Lessons</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <circle cx="12" cy="12" r="10"/>
+                                    <polyline points="12 6 12 12 16 14"/>
+                                </svg>
+                                <span>45+ Hours of Content</span>
+                            </div>
+                            <div class="info-item">
+                                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                    <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.07 19.5 19.5 0 0 1-6-6 19.79 19.79 0 0 1-3.07-8.67A2 2 0 0 1 4.11 2h3a2 2 0 0 1 2 1.72 12.84 12.84 0 0 0 .7 2.81 2 2 0 0 1-.45 2.11L8.09 9.91a16 16 0 0 0 6 6l1.27-1.27a2 2 0 0 1 2.11-.45 12.84 12.84 0 0 0 2.81.7A2 2 0 0 1 22 16.92z"/>
+                                </svg>
+                                <span>Lifetime Access + Certificate</span>
+                            </div>
+                        </div>
+                        <div class="course-description">
+                            <h3>Complete Learning Path</h3>
+                            <p>Get all three courses at a special bundle price. Perfect for those committed to mastering Portuguese from beginner to advanced level.</p>
+                            <ul>
+                                <li>All beginner, intermediate, and advanced content</li>
+                                <li>Progressive learning path</li>
+                                <li>Bonus materials and resources</li>
+                                <li>Certificate of completion</li>
+                                <li>Priority support</li>
+                            </ul>
+                        </div>
+                        <div class="course-price">
+                            <span class="price-old">$447</span>
+                            <span class="price">$349</span>
+                            <span class="price-save">Save $98</span>
+                            <a href="contact.html" class="btn btn-primary">Enroll Now</a>
+                        </div>
+                    </div>
+                </div>
+                </div>
+                <!-- End static courses -->
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Learn Portuguese with Isabel</h3>
+                    <p>Your trusted partner in mastering the Portuguese language. Join thousands of successful students today.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Welcome</a></li>
+                        <li><a href="courses.html">Courses</a></li>
+                        <li><a href="private-tutoring.html">Private Tutoring</a></li>
+                        <li><a href="account.html">Account</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/profile.php?id=61574538419425" class="social-link" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                            </svg>
+                        </a>
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Learn Portuguese with Isabel. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="courses-handler.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>
+

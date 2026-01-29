@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Course Player - Learn Portuguese with Isabel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo"><a href="index.html"><img src="images/lpwilogo.png" alt="Learn Portuguese with Isabel" style="height: 140px; width: auto;"></a></div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Welcome</a></li>
+                    <li><a href="courses.html">Courses</a></li>
+                    <li><a href="private-tutoring.html">Private Tutoring</a></li>
+                    <li><a href="account.html">Account</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li id="authNavItem">
+                        <a href="signin.html" class="btn btn-signin">Sign In</a>
+                    </li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Course Player -->
+    <section class="course-player-page">
+        <div class="container">
+            <div id="notLoggedIn" class="access-denied">
+                <h2>Access Denied</h2>
+                <p>You need to be signed in to access course content.</p>
+                <a href="signin.html" class="btn btn-primary">Sign In</a>
+            </div>
+
+            <div id="notPurchased" class="access-denied" style="display: none;">
+                <h2>Course Not Purchased</h2>
+                <p>You need to purchase this course to access the lessons.</p>
+                <a href="courses.html" class="btn btn-primary">View Courses</a>
+            </div>
+
+            <div id="coursePlayer" style="display: none;">
+                <div class="player-layout">
+                    <!-- Video Player Section -->
+                    <div class="player-main">
+                        <div class="video-container">
+                            <div id="videoPlayer"></div>
+                        </div>
+                        <div class="lesson-info">
+                            <h2 id="lessonTitle">Loading lesson...</h2>
+                            <p id="lessonDescription"></p>
+                        </div>
+                    </div>
+
+                    <!-- Course Sidebar -->
+                    <div class="player-sidebar">
+                        <div class="course-info">
+                            <h3 id="courseName">Course Name</h3>
+                            <p id="courseDescription"></p>
+                        </div>
+                        <div class="lessons-list">
+                            <h4>Lessons</h4>
+                            <ul id="lessonsList">
+                                <!-- Lessons will be loaded here -->
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Learn Portuguese with Isabel</h3>
+                    <p>Your trusted partner in mastering the Portuguese language. Join thousands of successful students today.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Welcome</a></li>
+                        <li><a href="courses.html">Courses</a></li>
+                        <li><a href="private-tutoring.html">Private Tutoring</a></li>
+                        <li><a href="account.html">Account</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/profile.php?id=61574538419425" class="social-link" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                            </svg>
+                        </a>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Learn Portuguese with Isabel. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module" src="course-player-handler.js"></script>
+    <script src="script.js"></script>
+    <script type="module" src="nav-auth.js"></script>
+</body>
+</html>
+
+
+
+
+

@@ -1,0 +1,277 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Supabase Connection</title>
+    <style>
+        body {
+            font-family: system-ui, -apple-system, sans-serif;
+            max-width: 800px;
+            margin: 50px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+        .test-box {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            margin: 20px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        .success { color: #16a34a; }
+        .error { color: #dc2626; }
+        .info { color: #2563eb; }
+        button {
+            background: #dc2626;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+        button:hover { background: #b91c1c; }
+        pre {
+            background: #f5f5f5;
+            padding: 15px;
+            border-radius: 6px;
+            overflow-x: auto;
+            font-size: 14px;
+        }
+        .status {
+            padding: 10px;
+            border-radius: 6px;
+            margin: 10px 0;
+        }
+        .status.success { background: #d1fae5; }
+        .status.error { background: #fee2e2; }
+        .status.info { background: #dbeafe; }
+    </style>
+</head>
+<body>
+    <h1>Supabase Connection Diagnostic Tool</h1>
+    <p>This page will test your Supabase connection and database setup.</p>
+    
+    <div class="test-box">
+        <h2>Step 1: Test Supabase Client Connection</h2>
+        <button onclick="testConnection()">Test Connection</button>
+        <div id="connectionResult"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Step 2: Test Database Tables</h2>
+        <button onclick="testTables()">Check Tables</button>
+        <div id="tablesResult"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Step 3: Test Authentication</h2>
+        <button onclick="testAuth()">Test Auth Setup</button>
+        <div id="authResult"></div>
+    </div>
+    
+    <div class="test-box">
+        <h2>Configuration Info</h2>
+        <div id="configInfo"></div>
+    </div>
+
+    <script type="module">
+        import { createClient } from 'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2/+esm'
+        
+        // Import from your config
+        import { supabase } from './supabase-config.js'
+        
+        window.supabase = supabase
+        
+        // Display configuration info
+        document.getElementById('configInfo').innerHTML = `
+            <div class="status info">
+                <strong>Supabase URL:</strong> ${supabase.supabaseUrl}<br>
+                <strong>Connection Status:</strong> <span id="configStatus">Loading...</span>
+            </div>
+        `
+        
+        // Test initial connection
+        async function testInitialConnection() {
+            try {
+                const { data, error } = await supabase.from('courses').select('count').limit(0)
+                if (error && error.code === '42P01') {
+                    document.getElementById('configStatus').innerHTML = '<span class="error">❌ Tables not created</span>'
+                } else if (error) {
+                    document.getElementById('configStatus').innerHTML = `<span class="error">❌ Error: ${error.message}</span>`
+                } else {
+                    document.getElementById('configStatus').innerHTML = '<span class="success">✅ Connected</span>'
+                }
+            } catch (err) {
+                document.getElementById('configStatus').innerHTML = `<span class="error">❌ Connection failed: ${err.message}</span>`
+            }
+        }
+        
+        testInitialConnection()
+        
+        window.testConnection = async function() {
+            const resultDiv = document.getElementById('connectionResult')
+            resultDiv.innerHTML = '<div class="status info">Testing...</div>'
+            
+            try {
+                // Test if we can reach Supabase
+                const { data, error } = await supabase.from('courses').select('count').limit(0)
+                
+                if (error) {
+                    if (error.code === '42P01') {
+                        resultDiv.innerHTML = `
+                            <div class="status error">
+                                <strong>❌ Database tables not found!</strong><br>
+                                Error: ${error.message}<br><br>
+                                <strong>Solution:</strong> You need to run the SQL setup script in Supabase SQL Editor.<br>
+                                Open <code>setup-database-complete.sql</code> and run it in your Supabase project.
+                            </div>
+                        `
+                    } else {
+                        resultDiv.innerHTML = `
+                            <div class="status error">
+                                <strong>❌ Connection Error</strong><br>
+                                Code: ${error.code}<br>
+                                Message: ${error.message}<br>
+                                Hint: ${error.hint || 'No hint available'}
+                            </div>
+                        `
+                    }
+                } else {
+                    resultDiv.innerHTML = `
+                        <div class="status success">
+                            <strong>✅ Connection Successful!</strong><br>
+                            Supabase client is working correctly.
+                        </div>
+                    `
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `
+                    <div class="status error">
+                        <strong>❌ Network Error</strong><br>
+                        ${err.message}<br><br>
+                        <strong>Possible causes:</strong><br>
+                        1. Supabase project is paused (check dashboard)<br>
+                        2. Wrong Supabase URL or API key<br>
+                        3. Network/CORS issues<br>
+                        4. Browser blocking the request
+                    </div>
+                `
+            }
+        }
+        
+        window.testTables = async function() {
+            const resultDiv = document.getElementById('tablesResult')
+            resultDiv.innerHTML = '<div class="status info">Checking tables...</div>'
+            
+            const tables = ['courses', 'lessons', 'purchases', 'lesson_progress']
+            const results = []
+            
+            for (const table of tables) {
+                try {
+                    const { data, error, count } = await supabase
+                        .from(table)
+                        .select('*', { count: 'exact', head: true })
+                    
+                    if (error) {
+                        if (error.code === '42P01') {
+                            results.push({ table, status: 'missing', error: 'Table does not exist' })
+                        } else {
+                            results.push({ table, status: 'error', error: error.message })
+                        }
+                    } else {
+                        results.push({ table, status: 'exists', count: count || 0 })
+                    }
+                } catch (err) {
+                    results.push({ table, status: 'error', error: err.message })
+                }
+            }
+            
+            let html = '<div class="status info"><strong>Table Check Results:</strong><ul style="margin-top:10px;">'
+            for (const result of results) {
+                if (result.status === 'exists') {
+                    html += `<li class="success">✅ <strong>${result.table}</strong> - Exists (${result.count} rows)</li>`
+                } else if (result.status === 'missing') {
+                    html += `<li class="error">❌ <strong>${result.table}</strong> - Does not exist</li>`
+                } else {
+                    html += `<li class="error">⚠️ <strong>${result.table}</strong> - Error: ${result.error}</li>`
+                }
+            }
+            html += '</ul></div>'
+            
+            if (results.some(r => r.status === 'missing')) {
+                html += `
+                    <div class="status error" style="margin-top:15px;">
+                        <strong>⚠️ Action Required:</strong><br>
+                        Some tables are missing. Please run <code>setup-database-complete.sql</code> in your Supabase SQL Editor.
+                    </div>
+                `
+            } else if (results.every(r => r.status === 'exists')) {
+                html += `
+                    <div class="status success" style="margin-top:15px;">
+                        <strong>✅ All tables exist!</strong> Your database is properly set up.
+                    </div>
+                `
+            }
+            
+            resultDiv.innerHTML = html
+        }
+        
+        window.testAuth = async function() {
+            const resultDiv = document.getElementById('authResult')
+            resultDiv.innerHTML = '<div class="status info">Testing authentication...</div>'
+            
+            try {
+                // Test if auth service is accessible (without creating accounts)
+                const { data: { session }, error: sessionError } = await supabase.auth.getSession()
+                const { data: { user }, error: getUserError } = await supabase.auth.getUser()
+                
+                // JWT errors are normal when no user is logged in - means auth service is working
+                if ((getUserError && (getUserError.message.includes('JWT') || getUserError.message.includes('session'))) || 
+                    (sessionError && sessionError.message.includes('JWT'))) {
+                    resultDiv.innerHTML = `
+                        <div class="status success">
+                            <strong>✅ Authentication is configured and working!</strong><br><br>
+                            <strong>What this means:</strong><br>
+                            • Supabase Auth is enabled and accessible<br>
+                            • The "JWT" error is normal (no active session exists)<br>
+                            • Authentication is ready to use<br><br>
+                            <strong>✅ You're all set!</strong><br><br>
+                            <strong>Next step:</strong> Go to <a href="signup.html" style="color: #dc2626; font-weight: bold;">signup.html</a> and create an account with a real email address.
+                        </div>
+                    `
+                } else if (!getUserError || session) {
+                    // User is logged in (unlikely in test scenario)
+                    resultDiv.innerHTML = `
+                        <div class="status success">
+                            <strong>✅ Authentication is working perfectly!</strong><br><br>
+                            Auth service is accessible and functional.<br><br>
+                            You can sign up new users at <a href="signup.html" style="color: #dc2626; font-weight: bold;">signup.html</a>
+                        </div>
+                    `
+                } else {
+                    // Some other error - might still be okay
+                    resultDiv.innerHTML = `
+                        <div class="status info">
+                            <strong>⚠️ Auth Service Check</strong><br>
+                            Error: ${getUserError?.message || 'Unknown'}<br><br>
+                            <strong>Note:</strong> This test might not reflect actual functionality.<br>
+                            <strong>Try this:</strong> Go to <a href="signup.html" style="color: #dc2626; font-weight: bold;">signup.html</a> and try creating an account - that's the real test!
+                        </div>
+                    `
+                }
+            } catch (err) {
+                resultDiv.innerHTML = `
+                    <div class="status info">
+                        <strong>⚠️ Auth Test Result</strong><br>
+                        ${err.message}<br><br>
+                        <strong>This might be okay!</strong> The test script might not have full access.<br>
+                        <strong>Real test:</strong> Go to <a href="signup.html" style="color: #dc2626; font-weight: bold;">signup.html</a> and try creating an account - that's the actual test!
+                    </div>
+                `
+            }
+        }
+    </script>
+</body>
+</html>

@@ -1,0 +1,201 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Payment Successful - Learn Portuguese with Isabel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body>
+    <!-- Navigation -->
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo"><a href="index.html"><img src="images/lpwilogo.png" alt="Learn Portuguese with Isabel" style="height: 140px; width: auto;"></a></div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Welcome</a></li>
+                    <li><a href="courses.html">Courses</a></li>
+                    <li><a href="private-tutoring.html">Private Tutoring</a></li>
+                    <li><a href="account.html">Account</a></li>
+                    <li><a href="contact.html">Contact</a></li>
+                    <li id="authNavItem">
+                        <a href="signin.html" class="btn btn-signin">Sign In</a>
+                    </li>
+                </ul>
+                <div class="hamburger">
+                    <span></span>
+                    <span></span>
+                    <span></span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- Payment Success -->
+    <section class="payment-success-page">
+        <div class="container">
+            <div class="success-card">
+                <div class="success-icon">
+                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"/>
+                        <polyline points="22 4 12 14.01 9 11.01"/>
+                    </svg>
+                </div>
+                <h1>Payment Successful!</h1>
+                <p>Thank you for your purchase. Your course is now available in your account.</p>
+                <div class="success-actions">
+                    <a href="#" id="startCourseBtn" class="btn btn-primary">Start Learning Now</a>
+                    <a href="account.html" class="btn btn-secondary">Go to My Courses</a>
+                    <a href="courses.html" class="btn btn-outline">Browse More Courses</a>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer -->
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>Learn Portuguese with Isabel</h3>
+                    <p>Your trusted partner in mastering the Portuguese language. Join thousands of successful students today.</p>
+                </div>
+                <div class="footer-section">
+                    <h4>Quick Links</h4>
+                    <ul>
+                        <li><a href="index.html">Welcome</a></li>
+                        <li><a href="courses.html">Courses</a></li>
+                        <li><a href="private-tutoring.html">Private Tutoring</a></li>
+                        <li><a href="account.html">Account</a></li>
+                        <li><a href="contact.html">Contact</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Legal</h4>
+                    <ul>
+                        <li><a href="privacy.html">Privacy Policy</a></li>
+                        <li><a href="terms.html">Terms of Service</a></li>
+                    </ul>
+                </div>
+                <div class="footer-section">
+                    <h4>Connect</h4>
+                    <div class="social-links">
+                        <a href="https://www.facebook.com/profile.php?id=61574538419425" class="social-link" aria-label="Facebook" target="_blank" rel="noopener noreferrer">
+                            <svg viewBox="0 0 24 24" fill="currentColor">
+                                <path d="M18 2h-3a5 5 0 0 0-5 5v3H7v4h3v8h4v-8h3l1-4h-4V7a1 1 0 0 1 1-1h3z"/>
+                            </svg>
+                        </a>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="footer-bottom">
+                <p>&copy; 2026 Learn Portuguese with Isabel. All rights reserved.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script type="module">
+        import { AuthService } from './auth.js'
+        import { CourseService } from './course-service.js'
+        
+        // Wait for DOM to be ready
+        document.addEventListener('DOMContentLoaded', async () => {
+            // Get course ID from URL
+            const urlParams = new URLSearchParams(window.location.search)
+            const courseId = urlParams.get('course_id')
+            const sessionId = urlParams.get('session_id')
+            
+            const startCourseBtn = document.getElementById('startCourseBtn')
+            
+            // Set up "Start Learning Now" button
+            if (courseId) {
+                startCourseBtn.href = `course-player.html?course=${courseId}`
+                startCourseBtn.addEventListener('click', async (e) => {
+                    e.preventDefault()
+                    // Verify purchase before redirecting
+                    const { user } = await AuthService.getCurrentUser()
+                    if (user) {
+                        const hasPurchased = await CourseService.hasPurchasedCourse(user.id, courseId)
+                        if (hasPurchased.success && hasPurchased.purchased) {
+                            window.location.href = `course-player.html?course=${courseId}`
+                        } else {
+                            // Purchase might not be recorded yet, wait a moment and try account page
+                            alert('Your purchase is being processed. Please check your account in a moment.')
+                            window.location.href = 'account.html'
+                        }
+                    } else {
+                        window.location.href = 'signin.html'
+                    }
+                })
+            } else {
+                startCourseBtn.href = 'account.html'
+                startCourseBtn.textContent = 'Go to My Courses'
+            }
+            
+            // Ensure purchase is recorded (in case webhook didn't fire)
+            if (courseId && sessionId) {
+                await ensurePurchaseRecorded(courseId, sessionId)
+            }
+        })
+        
+        // Fallback: Manually record purchase if webhook didn't fire
+        async function ensurePurchaseRecorded(courseId, sessionId) {
+            try {
+                const { user } = await AuthService.getCurrentUser()
+                if (!user) return
+                
+                // Check if purchase already exists
+                const hasPurchased = await CourseService.hasPurchasedCourse(user.id, courseId)
+                if (hasPurchased.success && hasPurchased.purchased) {
+                    console.log('Purchase already recorded')
+                    return
+                }
+                
+                // Wait a moment for webhook to process
+                await new Promise(resolve => setTimeout(resolve, 2000))
+                
+                // Check again
+                const checkAgain = await CourseService.hasPurchasedCourse(user.id, courseId)
+                if (checkAgain.success && checkAgain.purchased) {
+                    console.log('Purchase recorded by webhook')
+                    return
+                }
+                
+                // Webhook didn't fire, record manually
+                console.log('Webhook may not have fired, recording purchase manually...')
+                try {
+                    const response = await fetch('http://localhost:3000/api/record-purchase', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({
+                            courseId: courseId,
+                            userId: user.id,
+                            sessionId: sessionId
+                        })
+                    })
+                    
+                    const result = await response.json()
+                    if (result.success) {
+                        console.log('Purchase recorded manually:', result)
+                    } else {
+                        console.error('Failed to record purchase:', result.error)
+                    }
+                } catch (fetchError) {
+                    console.error('Error calling record-purchase endpoint:', fetchError)
+                }
+            } catch (error) {
+                console.error('Error checking purchase:', error)
+            }
+        }
+    </script>
+    <script src="script.js"></script>
+</body>
+</html>
+
+

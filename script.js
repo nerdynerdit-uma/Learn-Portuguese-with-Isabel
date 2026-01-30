@@ -2,31 +2,53 @@
 // Modern JavaScript for Interactivity
 // ============================================
 
-// Mobile Navigation Toggle
-const hamburger = document.querySelector('.hamburger');
-const navMenu = document.querySelector('.nav-menu');
+// Mobile Navigation Toggle (runs when DOM is ready for all devices including mobile)
+function initHamburgerMenu() {
+    const hamburger = document.querySelector('.hamburger');
+    const navMenu = document.querySelector('.nav-menu');
 
-if (hamburger && navMenu) {
-    hamburger.addEventListener('click', () => {
+    if (!hamburger || !navMenu) return;
+
+    function toggleMenu() {
         hamburger.classList.toggle('active');
         navMenu.classList.toggle('active');
+    }
+
+    function closeMenu() {
+        hamburger.classList.remove('active');
+        navMenu.classList.remove('active');
+    }
+
+    // Click (works for both mouse and touch on mobile)
+    hamburger.addEventListener('click', (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        toggleMenu();
     });
 
-    // Close menu when clicking on a link
-    document.querySelectorAll('.nav-menu a').forEach(link => {
-        link.addEventListener('click', () => {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
-        });
+    // Close menu when clicking/tapping a link
+    navMenu.querySelectorAll('a').forEach(link => {
+        link.addEventListener('click', closeMenu);
+        link.addEventListener('touchend', closeMenu);
     });
 
-    // Close menu when clicking outside
+    // Close menu when clicking/tapping outside
     document.addEventListener('click', (e) => {
         if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
-            hamburger.classList.remove('active');
-            navMenu.classList.remove('active');
+            closeMenu();
         }
     });
+    document.addEventListener('touchend', (e) => {
+        if (!hamburger.contains(e.target) && !navMenu.contains(e.target)) {
+            closeMenu();
+        }
+    });
+}
+
+if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', initHamburgerMenu);
+} else {
+    initHamburgerMenu();
 }
 
 // Navbar Scroll Effect

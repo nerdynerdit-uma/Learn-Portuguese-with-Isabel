@@ -173,20 +173,19 @@ function createCourseCard(course) {
     })
   }
   
-  // Add event listener to "Start Free Lesson" button to force signup for unregistered users
-  const startFreeLessonBtn = card.querySelector('a[href*="course-player.html"]')
-  if (startFreeLessonBtn && startFreeLessonBtn.textContent.includes('Start Free Lesson')) {
-    startFreeLessonBtn.addEventListener('click', async (e) => {
-      // Check if user is logged in
-      const { user } = await AuthService.getCurrentUser()
-      if (!user) {
-        e.preventDefault()
-        // Force redirect to signup page
-        window.location.href = 'signup.html'
-        return false
-      }
-      // If user is logged in, allow normal navigation
-    })
+  // Free course: force unregistered users (including on mobile) to sign up first
+  if (course.price === 0) {
+    const freeLessonLink = card.querySelector('.course-price a.btn-primary')
+    if (freeLessonLink) {
+      freeLessonLink.addEventListener('click', async (e) => {
+        const { user } = await AuthService.getCurrentUser()
+        if (!user) {
+          e.preventDefault()
+          window.location.href = 'signup.html'
+          return false
+        }
+      })
+    }
   }
   
   // Add tab functionality

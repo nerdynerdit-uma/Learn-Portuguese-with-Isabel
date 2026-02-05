@@ -9,6 +9,9 @@ let videoPlayer = null
 
 // Initialize player
 async function initPlayer() {
+  // Allow horizontal scroll on course player page so video isn't clipped
+  document.body.classList.add('course-player-page')
+  
   // Scroll to top of page first to ensure proper positioning
   window.scrollTo({ top: 0, behavior: 'instant' })
   

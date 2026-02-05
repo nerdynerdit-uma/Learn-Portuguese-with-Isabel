@@ -38,6 +38,11 @@ body {
     overflow-x: hidden;
 }
 
+/* Course player: allow horizontal scroll so video is never clipped */
+body.course-player-page {
+    overflow-x: auto;
+}
+
 .container {
     max-width: 1200px;
     margin: 0 auto;
@@ -182,8 +187,9 @@ body {
     display: flex;
     align-items: center;
     justify-content: center;
-    overflow: hidden;
-    padding-top: 140px;
+    overflow-x: hidden;
+    overflow-y: visible;
+    padding-top: 160px;
     padding-bottom: 4rem;
     background: linear-gradient(180deg, #fef8f6 0%, #f5f9f4 50%, #fafafa 100%);
     scroll-margin-top: 100px;
@@ -272,15 +278,18 @@ body {
     font-size: clamp(2.5rem, 8vw, 5rem);
     font-weight: 700;
     margin-bottom: 1.5rem;
-    line-height: 1.1;
+    line-height: 1.25;
+    padding-top: 0.15em;
 }
 
 .title-line {
     display: block;
+    padding: 0.1em 0;
     background: linear-gradient(135deg, var(--color-black) 0%, var(--color-red) 50%, var(--color-green) 100%);
     -webkit-background-clip: text;
     -webkit-text-fill-color: transparent;
     background-clip: text;
+    background-origin: padding-box;
     animation: gradientShift 3s ease infinite;
 }
 
@@ -1565,7 +1574,13 @@ section {
 .course-player-page {
     padding: 2rem 0;
     min-height: calc(100vh - 200px);
-    scroll-margin-top: 100px; /* Account for sticky navbar */
+    scroll-margin-top: 100px;
+}
+
+.course-player-page .container {
+    overflow: visible;
+    max-width: 1400px;
+    padding: 0 24px;
 }
 
 .access-denied {
@@ -1593,54 +1608,64 @@ section {
 
 .player-layout {
     display: grid;
-    grid-template-columns: 1fr 420px;
-    gap: 2rem;
+    grid-template-columns: minmax(0, 1fr) minmax(280px, 340px);
+    gap: 1.5rem;
     align-items: start;
     position: relative;
     z-index: 1;
+    min-width: 0;
 }
 
 .player-main {
+    min-width: 0;
+    max-width: 100%;
     background: var(--color-white);
     border-radius: 16px;
-    padding: 2rem;
+    padding: 1.5rem;
     box-shadow: var(--shadow-md);
     position: relative;
     z-index: 1;
 }
 
+/* Video area - maximize size, ensure video fits */
 .video-container {
-    width: 100%;
-    margin-bottom: 2rem;
-    border-radius: 12px;
-    overflow: hidden;
-    background: var(--color-black);
     position: relative;
-    scroll-margin-top: 120px; /* Account for navbar when scrolling */
+    width: 100%;
+    max-width: 100%;
+    margin-bottom: 1.5rem;
+    border-radius: 12px;
+    background: var(--color-black);
+    scroll-margin-top: 120px;
+    overflow: hidden;
+    aspect-ratio: 16 / 9;
 }
 
 #videoPlayer {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
-    aspect-ratio: 16/9;
-    min-height: 400px;
+    height: 100%;
     background: var(--color-black);
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
     visibility: visible;
     opacity: 1;
+    border-radius: 12px;
 }
 
 #videoPlayer iframe,
 #videoPlayer video {
+    position: absolute;
+    top: 0;
+    left: 0;
     width: 100%;
     height: 100%;
     border: none;
     display: block;
-    position: absolute;
-    top: 0;
-    left: 0;
+    object-fit: contain;
+}
+
+.lesson-info {
+    min-width: 0;
 }
 
 .lesson-info h2 {
@@ -2365,9 +2390,13 @@ section {
     }
 
     .hero {
-        padding-top: 100px;
+        padding-top: 120px;
         padding-bottom: 3rem;
         min-height: auto;
+    }
+
+    .hero-title {
+        padding-top: 0.2em;
     }
 
     .hero-buttons {
@@ -2408,8 +2437,21 @@ section {
         align-items: flex-start;
     }
 
+    .course-player-page .container {
+        padding: 0 16px;
+    }
+
     .player-layout {
         grid-template-columns: 1fr;
+        gap: 1.5rem;
+    }
+
+    .player-main {
+        padding: 1rem;
+    }
+
+    .video-container {
+        margin-bottom: 1rem;
     }
 
     .player-sidebar {
@@ -2435,12 +2477,13 @@ section {
     }
 
     .hero {
-        padding-top: 90px;
+        padding-top: 100px;
         padding-bottom: 2.5rem;
     }
 
     .hero-title {
         font-size: 2rem;
+        padding-top: 0.25em;
     }
 
     .hero-subtitle {

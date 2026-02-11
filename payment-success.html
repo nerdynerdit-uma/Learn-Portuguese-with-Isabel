@@ -168,7 +168,8 @@
                 // Webhook didn't fire, record manually
                 console.log('Webhook may not have fired, recording purchase manually...')
                 try {
-                    const response = await fetch('http://localhost:3000/api/record-purchase', {
+                    const apiBase = window.location.hostname === 'localhost' ? 'http://localhost:3000' : window.location.origin
+                    const response = await fetch(apiBase + '/api/record-purchase', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

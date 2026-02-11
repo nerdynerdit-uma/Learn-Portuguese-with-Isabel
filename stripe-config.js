@@ -3,10 +3,13 @@
 // Get your live keys from: https://dashboard.stripe.com/apikeys
 export const STRIPE_PUBLISHABLE_KEY = 'pk_live_51STALuF8HLHB8fgXnNrCAznNk0OSrHMyOdBynFmjzaxO4I90h6GgTumrjFdqTJSCvLHq2Jh90Gq77ge8cwqXQeAC00GPHVoMqa'
 
-// Stripe API endpoint (backend server)
-// For local development: http://localhost:3000/api/create-checkout-session
-// For production: https://your-domain.com/api/create-checkout-session
-export const STRIPE_API_ENDPOINT = 'http://localhost:3000/api/create-checkout-session'
+// Stripe API base: production = same origin (Vercel API), development = localhost:3000
+export function getStripeApiBase() {
+  if (typeof window === 'undefined') return 'http://localhost:3000'
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  return isLocal ? 'http://localhost:3000' : window.location.origin
+}
+export const STRIPE_API_ENDPOINT = getStripeApiBase() + '/api/create-checkout-session'
 
 // Initialize Stripe
 export async function initStripe() {
@@ -28,7 +31,7 @@ export async function initStripe() {
 // Check if backend server is available
 async function checkServerHealth() {
   try {
-    const healthUrl = STRIPE_API_ENDPOINT.replace('/api/create-checkout-session', '/api/health')
+    const healthUrl = getStripeApiBase() + '/api/health'
     const response = await fetch(healthUrl, {
       method: 'GET',
       signal: AbortSignal.timeout(3000) // 3 second timeout
@@ -46,13 +49,16 @@ export async function createCheckoutSession(courseId, userId) {
     // First check if server is available
     const serverAvailable = await checkServerHealth()
     if (!serverAvailable) {
+      const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
       return { 
         success: false, 
-        error: 'Backend server is not running. Please start the server on port 3000 using: npm run server' 
+        error: isLocal 
+          ? 'Backend server is not running. Please start it with: npm run server' 
+          : 'Payment service is temporarily unavailable. Please try again in a few moments or contact support.' 
       }
     }
 
-    const response = await fetch(STRIPE_API_ENDPOINT, {
+    const response = await fetch(getStripeApiBase() + '/api/create-checkout-session', {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
@@ -90,16 +96,14 @@ export async function createCheckoutSession(courseId, userId) {
     }
     
     if (error.message.includes('Failed to fetch') || error.message.includes('NetworkError')) {
+      const isLocal = typeof window !== 'undefined' && (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1')
       return { 
         success: false, 
-        error: 'Cannot connect to backend server. Please make sure the server is running on port 3000. Start it with: npm run server' 
+        error: isLocal ? 'Cannot connect to backend. Run: npm run server' : 'Payment service is temporarily unavailable. Please try again or contact support.' 
       }
     }
     
-    return { 
-      success: false, 
-      error: error.message || 'Cannot connect to server. Please make sure the backend server is running on port 3000.' 
-    }
+    return { success: false, error: error.message || 'Something went wrong. Please try again.' }
   }
 }
 

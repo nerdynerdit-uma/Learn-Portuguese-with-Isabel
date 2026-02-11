@@ -131,8 +131,8 @@ if (contactForm) {
         formMessage.style.display = 'block';
         
         try {
-            // Send email via API
-            const response = await fetch('http://localhost:3000/api/send-contact-email', {
+            const apiBase = (window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1') ? 'http://localhost:3000' : window.location.origin;
+            const response = await fetch(apiBase + '/api/send-contact-email', {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',

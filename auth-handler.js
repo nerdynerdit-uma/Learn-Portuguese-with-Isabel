@@ -39,10 +39,19 @@ if (signupForm) {
     const formMessage = document.getElementById('formMessage')
     const submitBtn = signupForm.querySelector('button[type="submit"]')
     
-    const fullName = document.getElementById('fullName').value
-    const email = document.getElementById('email').value
+    const fullName = document.getElementById('fullName').value.trim()
+    const email = document.getElementById('email').value.trim().toLowerCase()
     const password = document.getElementById('password').value
     const confirmPassword = document.getElementById('confirmPassword').value
+
+    // Basic email format check (permissive: allows business domains like user@company.co.uk)
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      formMessage.textContent = 'Please enter a valid email address (e.g. name@company.com).'
+      formMessage.className = 'form-message error'
+      formMessage.style.display = 'block'
+      return
+    }
 
     // Validate passwords match
     if (password !== confirmPassword) {
@@ -81,8 +90,8 @@ if (signupForm) {
           errorMsg = 'This email is already registered. Please sign in instead.'
         } else if (errorMsg.includes('password')) {
           errorMsg = 'Password must be at least 6 characters long.'
-        } else if (errorMsg.includes('email')) {
-          errorMsg = 'Please enter a valid email address.'
+        } else if (errorMsg.includes('email') || errorMsg.includes('Email')) {
+          errorMsg = 'Email issue: ' + (result.error || errorMsg) + '. If your address is valid (e.g. info@yoursite.com), try again or contact support.'
         }
         
         formMessage.textContent = errorMsg
@@ -168,7 +177,7 @@ if (forgotPasswordForm) {
     const formMessage = document.getElementById('formMessage')
     const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]')
     
-    const email = document.getElementById('email').value
+    const email = document.getElementById('email').value.trim().toLowerCase()
 
     // Disable button
     submitBtn.disabled = true
@@ -191,7 +200,8 @@ if (forgotPasswordForm) {
         }, 3000)
       } else {
         let errorMsg = result.error || 'An error occurred. Please try again.'
-        
+        const isRecoveryEmailError = /recovery email|sending.*email|error sending/i.test(errorMsg)
+
         // Provide helpful messages
         if (errorMsg.includes('fetch') || errorMsg.includes('network')) {
           errorMsg = 'Network error. Please check your connection and try again.'
@@ -199,15 +209,24 @@ if (forgotPasswordForm) {
           errorMsg = 'Too many requests. Please wait a few minutes and try again.'
         } else if (errorMsg.includes('not found') || errorMsg.includes('does not exist')) {
           errorMsg = 'No account found with this email address.'
+        } else if (isRecoveryEmailError) {
+          errorMsg = 'Supabase could not send the reset email (their default mailer is limited). ' +
+            'Fix: In Supabase Dashboard → Project Settings → Authentication → SMTP Settings, enable Custom SMTP and add your email provider (e.g. Gmail App Password). See EMAIL_SETUP.md.'
         }
-        
+
+        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+        if (isProduction && !isRecoveryEmailError) {
+          const redirectUrl = window.location.origin + '/reset-password.html'
+          errorMsg += ' In Supabase: Authentication → URL Configuration → Redirect URLs, add: ' + redirectUrl
+        }
+
         formMessage.textContent = errorMsg
         formMessage.className = 'form-message error'
         formMessage.style.display = 'block'
         submitBtn.disabled = false
         submitBtn.textContent = 'Send Reset Link'
-        
-        console.error('Password reset error:', result.error)
+
+        console.error('Password reset error:', result.error, result.errorStatus, result.errorCode)
       }
     } catch (error) {
       console.error('Unexpected password reset error:', error)

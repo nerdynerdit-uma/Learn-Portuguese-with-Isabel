@@ -2,12 +2,6 @@
 import Stripe from 'stripe'
 import { createClient } from '@supabase/supabase-js'
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY)
-const supabase = createClient(
-  process.env.SUPABASE_URL,
-  process.env.SUPABASE_SERVICE_ROLE_KEY
-)
-
 export default async function handler(req, res) {
   res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*')
   res.setHeader('Access-Control-Allow-Methods', 'POST, OPTIONS')
@@ -21,6 +15,21 @@ export default async function handler(req, res) {
     res.setHeader('Allow', 'POST')
     return res.status(405).json({ error: 'Method not allowed' })
   }
+
+  // Require env vars (must match your Supabase project - same as frontend)
+  const supabaseUrl = process.env.SUPABASE_URL
+  const supabaseServiceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
+  const stripeSecretKey = process.env.STRIPE_SECRET_KEY
+
+  if (!supabaseUrl || !supabaseServiceKey || !stripeSecretKey) {
+    console.error('Missing env: SUPABASE_URL=', !!supabaseUrl, 'SUPABASE_SERVICE_ROLE_KEY=', !!supabaseServiceKey, 'STRIPE_SECRET_KEY=', !!stripeSecretKey)
+    return res.status(500).json({
+      error: 'Server configuration error. Check Vercel Environment Variables: SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY, STRIPE_SECRET_KEY must be set.',
+    })
+  }
+
+  const stripe = new Stripe(stripeSecretKey)
+  const supabase = createClient(supabaseUrl, supabaseServiceKey)
 
   try {
     const { courseId, userId } = req.body || {}
@@ -36,8 +45,10 @@ export default async function handler(req, res) {
       .single()
 
     if (courseError || !course) {
-      console.error('Course error:', courseError)
-      return res.status(404).json({ error: 'Course not found' })
+      console.error('Course not found. courseId=', courseId, 'Supabase error:', courseError?.message || courseError?.code)
+      return res.status(404).json({
+        error: 'Course not found. In Vercel, set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY to the same Supabase project as your site (see VERCEL_ENV.md).',
+      })
     }
 
     const { data: existingPurchase } = await supabase

@@ -5,11 +5,11 @@ export class AuthService {
   // Sign up new user
   static async signUp(email, password, fullName) {
     try {
-      // Test Supabase connection first
-      console.log('Attempting to sign up user:', email)
-      
+      const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : email
+      console.log('Attempting to sign up user:', normalizedEmail)
+
       const { data, error } = await supabase.auth.signUp({
-        email,
+        email: normalizedEmail,
         password,
         options: {
           data: {
@@ -116,8 +116,9 @@ export class AuthService {
   // Reset password (send reset email)
   static async resetPassword(email) {
     try {
-      console.log('Sending password reset email to:', email)
-      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+      const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : email
+      console.log('Sending password reset email to:', normalizedEmail)
+      const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
         redirectTo: `${window.location.origin}/reset-password.html`
       })
       if (error) {
@@ -128,7 +129,16 @@ export class AuthService {
       return { success: true }
     } catch (error) {
       console.error('Password reset failed:', error)
-      return { success: false, error: error.message }
+      const message = error?.message || 'Unknown error'
+      const status = error?.status
+      const code = error?.code
+      return {
+        success: false,
+        error: message,
+        errorStatus: status,
+        errorCode: code,
+        originalError: error
+      }
     }
   }
 

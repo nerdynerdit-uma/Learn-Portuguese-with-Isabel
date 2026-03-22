@@ -8,7 +8,7 @@ Add these in **Vercel** → Project → **Settings** → **Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `ADMIN_EMAILS` | Comma-separated list of admin emails (e.g. `owner@example.com`). Only these accounts can load stats. **Required.** |
+| `ADMIN_EMAILS` | *(Optional.)* Comma-separated admin emails. If unset, **`learnportuguesewithisabel@gmail.com`** is allowed. Add this variable to include extra admins or change the default. |
 | `SUPABASE_URL` | Same as for payments. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Same as for payments. Used to validate your JWT and read purchases/users. **No separate anon key needed.** |
 

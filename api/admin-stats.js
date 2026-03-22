@@ -58,12 +58,17 @@ function buildMonthlySeries(dates, numMonths) {
   })
 }
 
+// When ADMIN_EMAILS is unset on Vercel, allow the primary site contact (override or add more via env).
+const DEFAULT_ADMIN_EMAILS = ['learnportuguesewithisabel@gmail.com']
+
 function parseAdminEmails() {
   const raw = process.env.ADMIN_EMAILS || ''
-  return raw
+  const fromEnv = raw
     .split(',')
     .map((e) => e.trim().toLowerCase())
     .filter(Boolean)
+  if (fromEnv.length > 0) return fromEnv
+  return DEFAULT_ADMIN_EMAILS
 }
 
 export default async function handler(req, res) {
@@ -91,10 +96,6 @@ export default async function handler(req, res) {
   }
 
   const adminEmails = parseAdminEmails()
-  if (adminEmails.length === 0) {
-    console.error('admin-stats: ADMIN_EMAILS is not set')
-    return res.status(500).json({ error: 'Admin access is not configured (ADMIN_EMAILS).' })
-  }
 
   const authHeader = req.headers.authorization || ''
   const token = authHeader.startsWith('Bearer ') ? authHeader.slice(7) : null

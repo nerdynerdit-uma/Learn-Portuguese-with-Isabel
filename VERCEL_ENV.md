@@ -9,7 +9,7 @@ In **Vercel Dashboard** → your project → **Settings** → **Environment Vari
 | `STRIPE_WEBHOOK_SECRET` | From Stripe Dashboard → Developers → Webhooks. Add endpoint URL: `https://learnportuguesewithisabel.com/api/webhook` (use the **Signing secret** from that endpoint after you switch Stripe accounts). |
 | `SUPABASE_URL` | **Must be exactly** your Supabase project URL (e.g. `https://xxxxx.supabase.co`). Same project as in `supabase-config.js`. Get from Supabase → Settings → API → Project URL. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase **service_role** key (not anon). Supabase → Settings → API → Project API keys → `service_role` (secret). Used by admin API to validate your session and read data. |
-| `ADMIN_EMAILS` | Comma-separated admin emails allowed to open **`/admin.html`** (e.g. `learnportuguesewithisabel@gmail.com`). **Required** or the admin API returns a configuration error. |
+| `ADMIN_EMAILS` | *(Optional.)* Comma-separated emails allowed to use **`/admin.html`**. If omitted, the API defaults to **`learnportuguesewithisabel@gmail.com`**. Set this to add co-admins or use a different owner email. |
 | `EMAIL_USER` | Gmail address (for contact form) |
 | `EMAIL_PASSWORD` | Gmail App Password (for contact form) |
 

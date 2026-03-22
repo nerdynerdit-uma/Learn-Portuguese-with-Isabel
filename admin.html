@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="robots" content="noindex, nofollow">
+    <title>Admin — Learn Portuguese with Isabel</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="admin-page">
+    <nav class="navbar">
+        <div class="container">
+            <div class="nav-wrapper">
+                <div class="logo"><a href="index.html"><img src="images/lpwilogo.png" alt="Learn Portuguese with Isabel" style="height: 100px; width: auto;"></a></div>
+                <ul class="nav-menu">
+                    <li><a href="index.html">Welcome</a></li>
+                    <li><a href="courses.html">Courses</a></li>
+                    <li><a href="index.html" class="btn btn-secondary">Exit admin</a></li>
+                </ul>
+                <div class="hamburger"><span></span><span></span><span></span></div>
+            </div>
+        </div>
+    </nav>
+
+    <section class="page-header admin-page-header">
+        <div class="container">
+            <h1>Admin dashboard</h1>
+        </div>
+    </section>
+
+    <section class="admin-auth-section" id="adminLoginSection">
+        <div class="container">
+            <div class="auth-wrapper">
+                <div class="auth-card admin-login-card">
+                    <h2>Sign in</h2>
+                    <form id="adminLoginForm" class="auth-form">
+                        <div class="form-group">
+                            <label for="adminEmail">Email</label>
+                            <input type="email" id="adminEmail" name="email" required autocomplete="email">
+                        </div>
+                        <div class="form-group">
+                            <label for="adminPassword">Password</label>
+                            <input type="password" id="adminPassword" name="password" required autocomplete="current-password">
+                        </div>
+                        <button type="submit" class="btn btn-primary btn-block" id="adminLoginBtn">Sign in</button>
+                        <p class="admin-forgot-password">
+                            <a href="forgot-password.html?email=learnportuguesewithisabel%40gmail.com" class="forgot-password">Forgot password?</a>
+                        </p>
+                        <div class="form-message" id="adminLoginMessage"></div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-dashboard-section" id="adminDashboard" hidden>
+        <div class="container">
+            <div class="admin-toolbar">
+                <p id="adminWelcome" class="admin-welcome"></p>
+                <button type="button" class="btn btn-secondary" id="adminSignOutBtn">Sign out</button>
+                <button type="button" class="btn btn-primary" id="adminRefreshBtn">Refresh data</button>
+            </div>
+
+            <div class="admin-totals" id="adminTotals"></div>
+
+            <div class="admin-charts-grid">
+                <div class="admin-chart-card">
+                    <h3>Completed purchases (weekly)</h3>
+                    <div class="admin-chart-wrap"><canvas id="chartPurchasesWeek"></canvas></div>
+                </div>
+                <div class="admin-chart-card">
+                    <h3>New accounts (weekly)</h3>
+                    <div class="admin-chart-wrap"><canvas id="chartSignupsWeek"></canvas></div>
+                </div>
+                <div class="admin-chart-card">
+                    <h3>Completed purchases (monthly)</h3>
+                    <div class="admin-chart-wrap"><canvas id="chartPurchasesMonth"></canvas></div>
+                </div>
+                <div class="admin-chart-card">
+                    <h3>New accounts (monthly)</h3>
+                    <div class="admin-chart-wrap"><canvas id="chartSignupsMonth"></canvas></div>
+                </div>
+            </div>
+
+            <div class="admin-table-wrap">
+                <h3>Purchase details</h3>
+                <p class="admin-hint">Country appears when stored on signup (optional). Otherwise &quot;—&quot;.</p>
+                <div class="admin-table-scroll">
+                    <table class="admin-table" id="adminPurchaseTable">
+                        <thead>
+                            <tr>
+                                <th>Email</th>
+                                <th>Course</th>
+                                <th>Purchase date</th>
+                                <th>Account created</th>
+                                <th>Country</th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminPurchaseTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-error-section" id="adminForbidden" hidden>
+        <div class="container">
+            <div class="auth-card admin-forbidden-card">
+                <h2>Access denied</h2>
+                <p>This account is not authorized as an admin. Contact the site developer if you need access.</p>
+                <a href="signin.html" class="btn btn-secondary">Back</a>
+            </div>
+        </div>
+    </section>
+
+    <section class="admin-error-section" id="adminConfigError" hidden>
+        <div class="container">
+            <div class="auth-card admin-forbidden-card">
+                <h2>Admin API unavailable</h2>
+                <p id="adminConfigErrorText">This page must be opened on the deployed site (or run <code>vercel dev</code>) so <code>/api/admin-stats</code> is available.</p>
+            </div>
+        </div>
+    </section>
+
+    <footer class="footer">
+        <div class="container">
+            <div class="footer-bottom">
+                <p>&copy; 2026 Learn Portuguese with Isabel. Admin area.</p>
+            </div>
+        </div>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+    <script type="module" src="admin-handler.js"></script>
+    <script type="module" src="nav-auth.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

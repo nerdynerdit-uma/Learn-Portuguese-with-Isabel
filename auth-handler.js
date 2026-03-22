@@ -172,37 +172,66 @@ if (signinForm) {
 // Handle forgot password form
 const forgotPasswordForm = document.getElementById('forgotPasswordForm')
 if (forgotPasswordForm) {
+  const emailParam = new URLSearchParams(window.location.search).get('email')
+  const emailInput = document.getElementById('email')
+  if (emailParam && emailInput) {
+    emailInput.value = decodeURIComponent(emailParam).trim()
+  }
+
+  function showForgotMessage(el, text, type) {
+    if (!el) return
+    el.textContent = text
+    el.className = type === 'success' ? 'form-message success' : 'form-message error'
+    el.style.display = 'block'
+    el.scrollIntoView({ behavior: 'smooth', block: 'nearest' })
+    try {
+      el.focus()
+    } catch {
+      /* ignore */
+    }
+  }
+
   forgotPasswordForm.addEventListener('submit', async (e) => {
     e.preventDefault()
     const formMessage = document.getElementById('formMessage')
     const submitBtn = forgotPasswordForm.querySelector('button[type="submit"]')
-    
-    const email = document.getElementById('email').value.trim().toLowerCase()
+    const emailField = document.getElementById('email')
 
-    // Disable button
+    if (!formMessage || !submitBtn || !emailField) {
+      console.error('Forgot password form: missing DOM elements')
+      return
+    }
+
+    const email = emailField.value.trim().toLowerCase()
+    const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+    if (!emailRegex.test(email)) {
+      showForgotMessage(formMessage, 'Please enter a valid email address.', 'error')
+      return
+    }
+
     submitBtn.disabled = true
     submitBtn.textContent = 'Sending...'
     formMessage.style.display = 'none'
+    formMessage.className = 'form-message error'
+    formMessage.textContent = ''
 
     try {
       const result = await AuthService.resetPassword(email)
 
       if (result.success) {
-        formMessage.textContent = 'Password reset link has been sent to your email. Please check your inbox (and spam folder).'
-        formMessage.className = 'form-message success'
-        formMessage.style.display = 'block'
+        const successText =
+          'A password reset has been sent. Consider checking your SPAM as well.'
+        showForgotMessage(formMessage, successText, 'success')
         forgotPasswordForm.reset()
-        
-        // Reset button after 3 seconds
+
         setTimeout(() => {
           submitBtn.disabled = false
           submitBtn.textContent = 'Send Reset Link'
-        }, 3000)
+        }, 2000)
       } else {
         let errorMsg = result.error || 'An error occurred. Please try again.'
         const isRecoveryEmailError = /recovery email|sending.*email|error sending/i.test(errorMsg)
 
-        // Provide helpful messages
         if (errorMsg.includes('fetch') || errorMsg.includes('network')) {
           errorMsg = 'Network error. Please check your connection and try again.'
         } else if (errorMsg.includes('rate limit')) {
@@ -210,19 +239,20 @@ if (forgotPasswordForm) {
         } else if (errorMsg.includes('not found') || errorMsg.includes('does not exist')) {
           errorMsg = 'No account found with this email address.'
         } else if (isRecoveryEmailError) {
-          errorMsg = 'Supabase could not send the reset email (their default mailer is limited). ' +
+          errorMsg =
+            'Supabase could not send the reset email (their default mailer is limited). ' +
             'Fix: In Supabase Dashboard → Project Settings → Authentication → SMTP Settings, enable Custom SMTP and add your email provider (e.g. Gmail App Password). See EMAIL_SETUP.md.'
         }
 
-        const isProduction = window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
+        const isProduction =
+          window.location.hostname !== 'localhost' && window.location.hostname !== '127.0.0.1'
         if (isProduction && !isRecoveryEmailError) {
           const redirectUrl = window.location.origin + '/reset-password.html'
-          errorMsg += ' In Supabase: Authentication → URL Configuration → Redirect URLs, add: ' + redirectUrl
+          errorMsg +=
+            ' In Supabase: Authentication → URL Configuration → Redirect URLs, add: ' + redirectUrl
         }
 
-        formMessage.textContent = errorMsg
-        formMessage.className = 'form-message error'
-        formMessage.style.display = 'block'
+        showForgotMessage(formMessage, errorMsg, 'error')
         submitBtn.disabled = false
         submitBtn.textContent = 'Send Reset Link'
 
@@ -230,9 +260,11 @@ if (forgotPasswordForm) {
       }
     } catch (error) {
       console.error('Unexpected password reset error:', error)
-      formMessage.textContent = `Error: ${error.message}. Check browser console for details.`
-      formMessage.className = 'form-message error'
-      formMessage.style.display = 'block'
+      showForgotMessage(
+        formMessage,
+        `Error: ${error.message}. Check browser console for details.`,
+        'error'
+      )
       submitBtn.disabled = false
       submitBtn.textContent = 'Send Reset Link'
     }

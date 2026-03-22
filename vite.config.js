@@ -22,7 +22,8 @@ export default defineConfig({
         terms: './terms.html',
         'payment-success': './payment-success.html',
         'forgot-password': './forgot-password.html',
-        'reset-password': './reset-password.html'
+        'reset-password': './reset-password.html',
+        admin: './admin.html'
       }
     }
   }

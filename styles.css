@@ -2590,3 +2590,154 @@ section {
 .bestsellerworld-link:hover {
     z-index: 1000;
 }
+
+/* ============================================
+   Admin dashboard (admin.html)
+   ============================================ */
+
+body.admin-page {
+    padding-top: 120px;
+}
+
+.admin-page-header {
+    padding-top: 2rem;
+    padding-bottom: 1rem;
+}
+
+.admin-sub {
+    color: var(--color-gray-dark);
+    font-size: 0.95rem;
+}
+
+.admin-login-card {
+    max-width: 420px;
+    margin: 0 auto;
+}
+
+.admin-forgot-password {
+    text-align: center;
+    margin-top: 1rem;
+    margin-bottom: 0;
+}
+
+.admin-dashboard-section {
+    padding: 2rem 0 4rem;
+}
+
+.admin-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    margin-bottom: 1.5rem;
+}
+
+.admin-welcome {
+    flex: 1;
+    min-width: 200px;
+    font-weight: 500;
+}
+
+.admin-totals {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 1rem;
+    margin-bottom: 2rem;
+}
+
+.admin-total-pill {
+    background: var(--color-gray-light);
+    padding: 0.75rem 1.25rem;
+    border-radius: 999px;
+    font-size: 0.95rem;
+}
+
+.admin-charts-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 1.5rem;
+    margin-bottom: 2.5rem;
+}
+
+.admin-chart-card {
+    background: var(--color-white);
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    padding: 1.25rem;
+    box-shadow: var(--shadow-sm);
+}
+
+.admin-chart-card h3 {
+    font-size: 1rem;
+    margin-bottom: 1rem;
+    color: var(--color-black);
+}
+
+.admin-chart-wrap {
+    position: relative;
+    height: 220px;
+}
+
+.admin-table-wrap {
+    margin-top: 1rem;
+}
+
+.admin-table-wrap h3 {
+    margin-bottom: 0.5rem;
+}
+
+.admin-hint {
+    font-size: 0.875rem;
+    color: var(--color-gray);
+    margin-bottom: 1rem;
+}
+
+.admin-table-scroll {
+    overflow-x: auto;
+    border: 1px solid #e5e5e5;
+    border-radius: 12px;
+    max-height: 480px;
+    overflow-y: auto;
+}
+
+.admin-table {
+    width: 100%;
+    border-collapse: collapse;
+    font-size: 0.9rem;
+}
+
+.admin-table th,
+.admin-table td {
+    padding: 0.75rem 1rem;
+    text-align: left;
+    border-bottom: 1px solid #eee;
+}
+
+.admin-table th {
+    background: var(--color-gray-light);
+    font-weight: 600;
+    position: sticky;
+    top: 0;
+    z-index: 1;
+}
+
+.admin-table tbody tr:hover {
+    background: #fafafa;
+}
+
+.admin-forbidden-card {
+    max-width: 520px;
+    margin: 2rem auto;
+    text-align: center;
+}
+
+.admin-error-section {
+    padding: 2rem 0 4rem;
+}
+
+@media (max-width: 768px) {
+    .admin-toolbar {
+        flex-direction: column;
+        align-items: stretch;
+    }
+}

@@ -1,15 +1,11 @@
 // Authentication utilities using Supabase
 import { supabase } from './supabase-config.js'
 
-// Same-origin API on Vercel; localhost uses origin (use `vercel dev` for /api locally).
+// Use current site origin so /api/send-recovery-email is same-origin on Vercel (required for fetch).
 function getApiBaseForAuth() {
   if (typeof window === 'undefined') return ''
-  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
-  return isLocal ? 'http://localhost:3000' : window.location.origin
+  return window.location.origin
 }
-
-// Gmail often drops Supabase SMTP when "from" and "to" are the same address — use server fallback.
-const PASSWORD_RESET_VIA_SERVER_EMAILS = ['learnportuguesewithisabel@gmail.com']
 
 export class AuthService {
   // Sign up new user
@@ -130,26 +126,36 @@ export class AuthService {
       console.log('Sending password reset email to:', normalizedEmail)
 
       const redirectTo = `${window.location.origin}/reset-password.html`
+      const base = getApiBaseForAuth()
 
-      if (PASSWORD_RESET_VIA_SERVER_EMAILS.includes(normalizedEmail)) {
-        const base = getApiBaseForAuth()
+      // Prefer Vercel API: Supabase Admin generateLink + Nodemailer (reliable; avoids Gmail self-send issues)
+      try {
         const response = await fetch(`${base}/api/send-recovery-email`, {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ email: normalizedEmail, redirectTo }),
         })
         const payload = await response.json().catch(() => ({}))
+        if (response.ok && payload.success) {
+          console.log('Password reset: server path ok', payload.sent ? '(mail sent)' : '(no user / privacy)')
+          return { success: true }
+        }
         if (!response.ok) {
           const msg = payload.error || `Server error (${response.status})`
-          return {
-            success: false,
-            error: msg,
-            errorStatus: response.status,
-            originalError: new Error(msg),
+          // If API not deployed (e.g. local Vite only), fall back to Supabase
+          if (response.status === 404) {
+            console.warn('send-recovery-email not found, using Supabase client')
+          } else {
+            return {
+              success: false,
+              error: msg,
+              errorStatus: response.status,
+              originalError: new Error(msg),
+            }
           }
         }
-        console.log('Password reset email sent via server fallback')
-        return { success: true }
+      } catch (fetchErr) {
+        console.warn('send-recovery-email fetch failed, using Supabase client:', fetchErr)
       }
 
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
@@ -159,7 +165,7 @@ export class AuthService {
         console.error('Password reset error:', error)
         throw error
       }
-      console.log('Password reset email sent successfully')
+      console.log('Password reset email sent via Supabase')
       return { success: true }
     } catch (error) {
       console.error('Password reset failed:', error)

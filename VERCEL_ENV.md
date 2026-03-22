@@ -12,7 +12,7 @@ In **Vercel Dashboard** → your project → **Settings** → **Environment Vari
 | `ADMIN_EMAILS` | *(Optional.)* Comma-separated emails allowed to use **`/admin.html`**. If omitted, the API defaults to **`learnportuguesewithisabel@gmail.com`**. Set this to add co-admins or use a different owner email. |
 | `EMAIL_USER` | Gmail address (contact form + **owner password reset** via `/api/send-recovery-email`) |
 | `EMAIL_PASSWORD` | Gmail App Password (same as above) |
-| `RECOVERY_FALLBACK_EMAILS` | *(Optional.)* Comma-separated addresses that receive reset links via Nodemailer instead of Supabase SMTP. Default includes the owner Gmail — avoids “email to self” delivery issues. |
+| `RECOVERY_BCC` | *(Optional.)* Comma-separated BCC addresses — e.g. your personal inbox — so you still get a copy if Gmail hides mail to the same address as the sender. |
 
 **Important:** If checkout shows "Course not found", the API cannot see your courses. Check:
 1. `SUPABASE_URL` is the **exact** URL of the project where your courses table lives (same as in `supabase-config.js`).

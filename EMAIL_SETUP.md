@@ -1,10 +1,10 @@
 # Email Setup Guide for Supabase
 
-## Owner account (`learnportuguesewithisabel@gmail.com`) — password reset
+## Password reset (all users)
 
-If password reset works for **other** addresses but **not** for the same Gmail you use as **SMTP sender**, Gmail often filters “mail to self.” This project uses **`/api/send-recovery-email`** on Vercel for that address: it builds a recovery link with Supabase Admin and sends it with **Nodemailer** (`EMAIL_USER` / `EMAIL_PASSWORD` on Vercel), same as the contact form.
+Forgot-password uses **`/api/send-recovery-email`** on Vercel: **Supabase Admin** `generateLink` + **Nodemailer** (`EMAIL_USER` / `EMAIL_PASSWORD`). It does not rely on Supabase SMTP for delivery.
 
-Optional env: **`RECOVERY_FALLBACK_EMAILS`** — comma-separated list of addresses that use this path (default: owner email only).
+If mail still does not arrive at **the same Gmail** you use as `EMAIL_USER`, Gmail may filter “mail to self.” Add **`RECOVERY_BCC`** on Vercel with another address (comma-separated) to receive a copy of the reset email.
 
 ---
 

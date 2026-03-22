@@ -8,20 +8,29 @@ function getApiBaseForAuth() {
 }
 
 export class AuthService {
-  // Sign up new user
-  static async signUp(email, password, fullName) {
+  // Sign up new user (country optional — shown in admin purchase table)
+  // signupRef e.g. 'free_lesson' when coming from signup.html?ref=free-lesson (admin free-lesson stats)
+  static async signUp(email, password, fullName, country = null, signupRef = null) {
     try {
       const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : email
       console.log('Attempting to sign up user:', normalizedEmail)
+
+      const userMeta = {
+        full_name: fullName,
+      }
+      if (country && String(country).trim()) {
+        userMeta.country = String(country).trim()
+      }
+      if (signupRef && String(signupRef).trim()) {
+        userMeta.signup_ref = String(signupRef).trim()
+      }
 
       const { data, error } = await supabase.auth.signUp({
         email: normalizedEmail,
         password,
         options: {
-          data: {
-            full_name: fullName
-          }
-        }
+          data: userMeta,
+        },
       })
 
       if (error) {

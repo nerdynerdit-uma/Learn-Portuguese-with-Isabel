@@ -61,6 +61,54 @@ function buildMonthlySeries(dates, numMonths) {
 // When ADMIN_EMAILS is unset on Vercel, allow the primary site contact (override or add more via env).
 const DEFAULT_ADMIN_EMAILS = ['learnportuguesewithisabel@gmail.com']
 
+/** When user_metadata.country is empty, infer a hint from email domain (not exact location). */
+function inferCountryHintFromEmail(email) {
+  if (!email || typeof email !== 'string') return null
+  const domain = email.split('@')[1]?.toLowerCase() || ''
+  if (!domain) return null
+  const rules = [
+    ['.co.uk', 'United Kingdom (inferred from email)'],
+    ['.uk', 'United Kingdom (inferred from email)'],
+    ['.pt', 'Portugal (inferred from email)'],
+    ['.de', 'Germany (inferred from email)'],
+    ['.fr', 'France (inferred from email)'],
+    ['.nl', 'Netherlands (inferred from email)'],
+    ['.be', 'Belgium (inferred from email)'],
+    ['.es', 'Spain (inferred from email)'],
+    ['.it', 'Italy (inferred from email)'],
+    ['.com.au', 'Australia (inferred from email)'],
+    ['.co.nz', 'New Zealand (inferred from email)'],
+    ['.ca', 'Canada (inferred from email)'],
+    ['.com.br', 'Brazil (inferred from email)'],
+    ['.ie', 'Ireland (inferred from email)'],
+    ['.ch', 'Switzerland (inferred from email)'],
+    ['.at', 'Austria (inferred from email)'],
+    ['.se', 'Sweden (inferred from email)'],
+    ['.no', 'Norway (inferred from email)'],
+    ['.dk', 'Denmark (inferred from email)'],
+    ['.fi', 'Finland (inferred from email)'],
+    ['.pl', 'Poland (inferred from email)'],
+    ['.googlemail.com', 'United Kingdom (inferred from email)'],
+    ['.outlook.com', null],
+    ['.gmail.com', null],
+    ['.yahoo.', null],
+  ]
+  for (const [suffix, label] of rules) {
+    if (label && domain.endsWith(suffix)) return label
+  }
+  return null
+}
+
+function resolveCountryDisplay(meta, email) {
+  const raw =
+    meta.country ||
+    meta.location ||
+    meta.address_country ||
+    (typeof meta.address === 'object' && meta.address?.country)
+  if (raw && String(raw).trim()) return String(raw).trim()
+  return inferCountryHintFromEmail(email)
+}
+
 function parseAdminEmails() {
   const raw = process.env.ADMIN_EMAILS || ''
   const fromEnv = raw
@@ -160,10 +208,11 @@ export default async function handler(req, res) {
   const userById = {}
   for (const u of allUsers) {
     const meta = u.user_metadata || {}
+    const email = u.email || ''
     userById[u.id] = {
-      email: u.email,
+      email,
       created_at: u.created_at,
-      country: meta.country || meta.location || null,
+      country: resolveCountryDisplay(meta, email),
       full_name: meta.full_name || meta.name || null,
     }
   }
@@ -186,6 +235,45 @@ export default async function handler(req, res) {
     }
   })
 
+  // Free lesson: signup tagged with ?ref=free-lesson OR any lesson_progress on the free course
+  const { data: freeCourseRow } = await admin.from('courses').select('id').eq('bundle_name', 'free').maybeSingle()
+
+  const progressUserIds = new Set()
+  if (freeCourseRow?.id) {
+    const { data: freeLessons, error: flErr } = await admin.from('lessons').select('id').eq('course_id', freeCourseRow.id)
+    if (flErr) {
+      console.error('admin-stats free lessons:', flErr)
+    } else {
+      const lessonIds = (freeLessons || []).map((l) => l.id)
+      if (lessonIds.length > 0) {
+        const { data: lpRows, error: lpErr } = await admin.from('lesson_progress').select('user_id').in('lesson_id', lessonIds)
+        if (lpErr) {
+          console.error('admin-stats lesson_progress:', lpErr)
+        } else {
+          for (const row of lpRows || []) {
+            if (row.user_id) progressUserIds.add(row.user_id)
+          }
+        }
+      }
+    }
+  }
+
+  const freeLessonRows = []
+  const seenFree = new Set()
+  for (const u of allUsers) {
+    const meta = u.user_metadata || {}
+    const tagged = meta.signup_ref === 'free_lesson'
+    const engaged = progressUserIds.has(u.id)
+    if (!tagged && !engaged) continue
+    if (seenFree.has(u.id)) continue
+    seenFree.add(u.id)
+    freeLessonRows.push({
+      email: u.email || '—',
+      full_name: meta.full_name || meta.name || null,
+      created_at: u.created_at,
+    })
+  }
+
   return res.status(200).json({
     purchasesWeekly: buildWeeklySeries(purchaseDates, 8),
     purchasesMonthly: buildMonthlySeries(purchaseDates, 12),
@@ -194,7 +282,9 @@ export default async function handler(req, res) {
     totals: {
       purchases: (purchases || []).length,
       users: allUsers.length,
+      freeLessonSignups: freeLessonRows.length,
     },
     rows,
+    freeLessonRows,
   })
 }

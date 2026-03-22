@@ -181,7 +181,7 @@ function createCourseCard(course) {
         const { user } = await AuthService.getCurrentUser()
         if (!user) {
           e.preventDefault()
-          window.location.href = 'signup.html'
+          window.location.href = 'signup.html?ref=free-lesson'
           return false
         }
       })
@@ -543,7 +543,7 @@ function getPurchaseButton(course) {
   if (course.price === 0) {
     if (!currentUser) {
       // For unregistered users, show "Start Free Lesson" but it will redirect to signup
-      return `<a href="signup.html" class="btn btn-primary">Start Free Lesson</a>`
+      return `<a href="signup.html?ref=free-lesson" class="btn btn-primary">Start Free Lesson</a>`
     }
     // For logged-in users, allow access to free lesson
     return `<a href="course-player.html?course=${course.id}" class="btn btn-primary">Start Free Lesson</a>`

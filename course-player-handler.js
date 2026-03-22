@@ -23,24 +23,33 @@ async function initPlayer() {
   if (notLoggedIn) notLoggedIn.style.display = 'none'
   if (notPurchased) notPurchased.style.display = 'none'
   if (coursePlayer) coursePlayer.style.display = 'none'
-  
-  // Check authentication
-  const { user, error: authError } = await AuthService.getCurrentUser()
-  
-  if (!user) {
-    console.log('User not logged in:', authError)
-    // Force redirect to signup page for unregistered users
-    window.location.href = 'signup.html'
-    return
-  }
-  
-  currentUser = user
-  console.log('User logged in:', user.id)
-  
-  // Get course ID from URL
+
+  // Get course ID from URL (needed before auth redirect for free-lesson signup tagging)
   const urlParams = new URLSearchParams(window.location.search)
   const courseId = urlParams.get('course')
   const lessonId = urlParams.get('lesson')
+
+  // Check authentication
+  const { user, error: authError } = await AuthService.getCurrentUser()
+
+  if (!user) {
+    console.log('User not logged in:', authError)
+    let signupUrl = 'signup.html'
+    if (courseId) {
+      const courseResult = await CourseService.getCourse(courseId)
+      const c = courseResult?.course
+      const isFree =
+        courseResult?.success &&
+        c &&
+        (Number(c.price) === 0 || c.bundle_name === 'free')
+      if (isFree) signupUrl = 'signup.html?ref=free-lesson'
+    }
+    window.location.href = signupUrl
+    return
+  }
+
+  currentUser = user
+  console.log('User logged in:', user.id)
   
   if (!courseId) {
     console.error('No course ID in URL')

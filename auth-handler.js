@@ -40,6 +40,10 @@ if (signupForm) {
     const submitBtn = signupForm.querySelector('button[type="submit"]')
     
     const fullName = document.getElementById('fullName').value.trim()
+    const countryEl = document.getElementById('country')
+    const country = countryEl ? countryEl.value.trim() : ''
+    const refParam = new URLSearchParams(window.location.search).get('ref')
+    const signupRef = refParam === 'free-lesson' ? 'free_lesson' : null
     const email = document.getElementById('email').value.trim().toLowerCase()
     const password = document.getElementById('password').value
     const confirmPassword = document.getElementById('confirmPassword').value
@@ -67,7 +71,7 @@ if (signupForm) {
     formMessage.style.display = 'none'
 
     try {
-      const result = await AuthService.signUp(email, password, fullName)
+      const result = await AuthService.signUp(email, password, fullName, country || null, signupRef)
 
       if (result.success) {
         formMessage.textContent = 'Account created successfully! Please check your email to verify your account.'

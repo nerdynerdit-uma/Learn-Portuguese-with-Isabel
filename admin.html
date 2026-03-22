@@ -87,19 +87,37 @@
 
             <div class="admin-table-wrap">
                 <h3>Purchase details</h3>
-                <p class="admin-hint">Country appears when stored on signup (optional). Otherwise &quot;—&quot;.</p>
+                <p class="admin-hint">Country: from signup when provided, otherwise a hint from the email domain where possible.</p>
                 <div class="admin-table-scroll">
                     <table class="admin-table" id="adminPurchaseTable">
                         <thead>
                             <tr>
-                                <th>Email</th>
-                                <th>Course</th>
-                                <th>Purchase date</th>
-                                <th>Account created</th>
-                                <th>Country</th>
+                                <th scope="col"><button type="button" class="admin-sort-btn" data-sort-key="full_name"><span class="admin-sort-label">Name</span><span class="admin-sort-indicator" aria-hidden="true"></span></button></th>
+                                <th scope="col"><button type="button" class="admin-sort-btn" data-sort-key="email"><span class="admin-sort-label">Email</span><span class="admin-sort-indicator" aria-hidden="true"></span></button></th>
+                                <th scope="col"><button type="button" class="admin-sort-btn" data-sort-key="course_name"><span class="admin-sort-label">Course</span><span class="admin-sort-indicator" aria-hidden="true"></span></button></th>
+                                <th scope="col"><button type="button" class="admin-sort-btn" data-sort-key="purchased_at"><span class="admin-sort-label">Purchase date</span><span class="admin-sort-indicator" aria-hidden="true"></span></button></th>
+                                <th scope="col"><button type="button" class="admin-sort-btn" data-sort-key="user_created_at"><span class="admin-sort-label">Account created</span><span class="admin-sort-indicator" aria-hidden="true"></span></button></th>
+                                <th scope="col">Country</th>
                             </tr>
                         </thead>
                         <tbody id="adminPurchaseTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <div class="admin-table-wrap">
+                <h3>Free lesson</h3>
+                <p class="admin-hint">People who signed up via the free lesson (tagged link) or have activity on the free course. Each person is listed once.</p>
+                <div class="admin-table-scroll">
+                    <table class="admin-table" id="adminFreeLessonTable">
+                        <thead>
+                            <tr>
+                                <th scope="col"><button type="button" class="admin-sort-btn" data-sort-key="full_name"><span class="admin-sort-label">Name</span><span class="admin-sort-indicator" aria-hidden="true"></span></button></th>
+                                <th scope="col"><button type="button" class="admin-sort-btn" data-sort-key="email"><span class="admin-sort-label">Email</span><span class="admin-sort-indicator" aria-hidden="true"></span></button></th>
+                                <th scope="col"><button type="button" class="admin-sort-btn" data-sort-key="created_at"><span class="admin-sort-label">Account created</span><span class="admin-sort-indicator" aria-hidden="true"></span></button></th>
+                            </tr>
+                        </thead>
+                        <tbody id="adminFreeLessonTableBody"></tbody>
                     </table>
                 </div>
             </div>

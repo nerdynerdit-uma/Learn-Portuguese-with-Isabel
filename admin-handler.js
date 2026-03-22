@@ -29,6 +29,15 @@ let charts = {
   sm: null,
 }
 
+/** Cached purchase rows for client-side sorting */
+let purchaseRowsCache = []
+/** Default: newest purchases first */
+let sortState = { key: 'purchased_at', dir: 'desc' }
+
+/** Free lesson table */
+let freeLessonRowsCache = []
+let freeLessonSortState = { key: 'created_at', dir: 'desc' }
+
 function destroyCharts() {
   Object.values(charts).forEach((c) => {
     if (c) c.destroy()
@@ -77,13 +86,53 @@ function formatDt(iso) {
   }
 }
 
-function renderTable(rows) {
+function compareRows(a, b, key) {
+  const va = a[key]
+  const vb = b[key]
+  if (key === 'purchased_at' || key === 'user_created_at' || key === 'created_at') {
+    const ta = va ? new Date(va).getTime() : 0
+    const tb = vb ? new Date(vb).getTime() : 0
+    const na = Number.isFinite(ta) ? ta : 0
+    const nb = Number.isFinite(tb) ? tb : 0
+    return na - nb
+  }
+  const sa = (va == null ? '' : String(va)).toLowerCase()
+  const sb = (vb == null ? '' : String(vb)).toLowerCase()
+  return sa.localeCompare(sb, undefined, { sensitivity: 'base' })
+}
+
+function getSortedRows() {
+  const rows = [...purchaseRowsCache]
+  const { key, dir } = sortState
+  rows.sort((a, b) => {
+    const c = compareRows(a, b, key)
+    return dir === 'asc' ? c : -c
+  })
+  return rows
+}
+
+function updatePurchaseSortHeaders() {
+  document.querySelectorAll('#adminPurchaseTable .admin-sort-btn').forEach((btn) => {
+    const key = btn.getAttribute('data-sort-key')
+    const active = key === sortState.key
+    const ind = btn.querySelector('.admin-sort-indicator')
+    if (ind) {
+      ind.textContent = active ? (sortState.dir === 'asc' ? ' ▲' : ' ▼') : ''
+    }
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false')
+    btn.setAttribute('aria-sort', active ? (sortState.dir === 'asc' ? 'ascending' : 'descending') : 'none')
+  })
+}
+
+function renderPurchaseTable() {
   const tbody = document.getElementById('adminPurchaseTableBody')
   if (!tbody) return
+  const rows = getSortedRows()
   tbody.innerHTML = rows
     .map(
       (r) => `
     <tr>
+      <td>${escapeHtml(r.full_name || '—')}</td>
       <td>${escapeHtml(r.email)}</td>
       <td>${escapeHtml(r.course_name)}</td>
       <td>${escapeHtml(formatDt(r.purchased_at))}</td>
@@ -93,6 +142,94 @@ function renderTable(rows) {
   `
     )
     .join('')
+  updatePurchaseSortHeaders()
+}
+
+function setPurchaseRows(rows) {
+  purchaseRowsCache = Array.isArray(rows) ? rows : []
+  renderPurchaseTable()
+}
+
+function initPurchaseTableSort() {
+  document.querySelectorAll('#adminPurchaseTable .admin-sort-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.getAttribute('data-sort-key')
+      if (!key) return
+      if (sortState.key === key) {
+        sortState.dir = sortState.dir === 'asc' ? 'desc' : 'asc'
+      } else {
+        sortState.key = key
+        sortState.dir =
+          key === 'purchased_at' || key === 'user_created_at' ? 'desc' : 'asc'
+      }
+      renderPurchaseTable()
+    })
+  })
+}
+
+function getSortedFreeLessonRows() {
+  const rows = [...freeLessonRowsCache]
+  const { key, dir } = freeLessonSortState
+  rows.sort((a, b) => {
+    const c = compareRows(a, b, key)
+    return dir === 'asc' ? c : -c
+  })
+  return rows
+}
+
+function updateFreeLessonSortHeaders() {
+  document.querySelectorAll('#adminFreeLessonTable .admin-sort-btn').forEach((btn) => {
+    const key = btn.getAttribute('data-sort-key')
+    const active = key === freeLessonSortState.key
+    const ind = btn.querySelector('.admin-sort-indicator')
+    if (ind) {
+      ind.textContent = active ? (freeLessonSortState.dir === 'asc' ? ' ▲' : ' ▼') : ''
+    }
+    btn.setAttribute('aria-pressed', active ? 'true' : 'false')
+    btn.setAttribute(
+      'aria-sort',
+      active ? (freeLessonSortState.dir === 'asc' ? 'ascending' : 'descending') : 'none'
+    )
+  })
+}
+
+function renderFreeLessonTable() {
+  const tbody = document.getElementById('adminFreeLessonTableBody')
+  if (!tbody) return
+  const rows = getSortedFreeLessonRows()
+  tbody.innerHTML = rows
+    .map(
+      (r) => `
+    <tr>
+      <td>${escapeHtml(r.full_name || '—')}</td>
+      <td>${escapeHtml(r.email)}</td>
+      <td>${escapeHtml(formatDt(r.created_at))}</td>
+    </tr>
+  `
+    )
+    .join('')
+  updateFreeLessonSortHeaders()
+}
+
+function setFreeLessonRows(rows) {
+  freeLessonRowsCache = Array.isArray(rows) ? rows : []
+  renderFreeLessonTable()
+}
+
+function initFreeLessonTableSort() {
+  document.querySelectorAll('#adminFreeLessonTable .admin-sort-btn').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      const key = btn.getAttribute('data-sort-key')
+      if (!key) return
+      if (freeLessonSortState.key === key) {
+        freeLessonSortState.dir = freeLessonSortState.dir === 'asc' ? 'desc' : 'asc'
+      } else {
+        freeLessonSortState.key = key
+        freeLessonSortState.dir = key === 'created_at' ? 'desc' : 'asc'
+      }
+      renderFreeLessonTable()
+    })
+  })
 }
 
 function escapeHtml(s) {
@@ -168,14 +305,17 @@ async function loadDashboard(session) {
 
     const totals = document.getElementById('adminTotals')
     if (totals && data.totals) {
+      const fl = typeof data.totals.freeLessonSignups === 'number' ? data.totals.freeLessonSignups : 0
       totals.innerHTML = `
         <div class="admin-total-pill"><strong>${data.totals.purchases}</strong> completed purchases</div>
         <div class="admin-total-pill"><strong>${data.totals.users}</strong> user accounts</div>
+        <div class="admin-total-pill admin-total-pill--accent"><strong>${fl}</strong> free lesson accounts</div>
       `
     }
 
     renderCharts(data)
-    renderTable(data.rows || [])
+    setPurchaseRows(data.rows || [])
+    setFreeLessonRows(data.freeLessonRows || [])
   } catch (e) {
     console.error(e)
     show('adminLoginSection', false)
@@ -264,6 +404,8 @@ async function init() {
   }
 
   await trySession()
+  initPurchaseTableSort()
+  initFreeLessonTableSort()
 }
 
 if (document.readyState === 'loading') {

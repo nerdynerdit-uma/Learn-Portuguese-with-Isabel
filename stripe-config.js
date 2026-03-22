@@ -1,7 +1,12 @@
-// Stripe Configuration
-// Using LIVE MODE for production
-// Get your live keys from: https://dashboard.stripe.com/apikeys
-export const STRIPE_PUBLISHABLE_KEY = 'pk_live_51STALuF8HLHB8fgXnNrCAznNk0OSrHMyOdBynFmjzaxO4I90h6GgTumrjFdqTJSCvLHq2Jh90Gq77ge8cwqXQeAC00GPHVoMqa'
+// Stripe Configuration (browser)
+// Publishable key MUST be from the same Stripe account as STRIPE_SECRET_KEY on Vercel.
+// Set VITE_STRIPE_PUBLISHABLE_KEY in Vercel → Environment Variables (and .env.local for local dev).
+// https://dashboard.stripe.com/apikeys
+const fromEnv =
+  typeof import.meta !== 'undefined' && import.meta.env && import.meta.env.VITE_STRIPE_PUBLISHABLE_KEY
+const fromWindow =
+  typeof window !== 'undefined' && window.__STRIPE_PUBLISHABLE_KEY
+export const STRIPE_PUBLISHABLE_KEY = String(fromEnv || fromWindow || '').trim()
 
 // Stripe API base: production = same origin (Vercel API), development = localhost:3000
 export function getStripeApiBase() {
@@ -13,6 +18,12 @@ export const STRIPE_API_ENDPOINT = getStripeApiBase() + '/api/create-checkout-se
 
 // Initialize Stripe
 export async function initStripe() {
+  if (!STRIPE_PUBLISHABLE_KEY) {
+    console.error(
+      'Missing Stripe publishable key. Add VITE_STRIPE_PUBLISHABLE_KEY (pk_live_...) to Vercel and redeploy, or set window.__STRIPE_PUBLISHABLE_KEY for testing. Must match your server STRIPE_SECRET_KEY account.'
+    )
+    throw new Error('Stripe publishable key is not configured')
+  }
   if (typeof Stripe === 'undefined') {
     // Load Stripe.js from CDN
     const script = document.createElement('script')
@@ -107,13 +118,30 @@ export async function createCheckoutSession(courseId, userId) {
   }
 }
 
-// Redirect to Stripe Checkout
-export async function redirectToCheckout(sessionId) {
+/**
+ * Redirect to Stripe Checkout.
+ * Prefer the session `url` from the server (no publishable-key mismatch on hosted Checkout).
+ * Falls back to Stripe.js redirectToCheckout only if url is missing.
+ */
+export async function redirectToCheckout(sessionOrId) {
+  const session =
+    typeof sessionOrId === 'string' ? { id: sessionOrId } : sessionOrId || {}
+
+  if (session.url && typeof session.url === 'string') {
+    window.location.assign(session.url)
+    return
+  }
+
+  if (!session.id) {
+    console.error('redirectToCheckout: missing session id and url')
+    return
+  }
+
   const stripe = await initStripe()
   const { error } = await stripe.redirectToCheckout({
-    sessionId: sessionId
+    sessionId: session.id
   })
-  
+
   if (error) {
     console.error('Error redirecting to checkout:', error)
   }

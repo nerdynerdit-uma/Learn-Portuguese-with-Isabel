@@ -577,7 +577,7 @@ async function handlePurchase(course) {
     const result = await createCheckoutSession(course.id, currentUser.id)
     
     if (result.success) {
-      await redirectToCheckout(result.session.id)
+      await redirectToCheckout(result.session)
     } else {
       const errorMsg = result.error || 'Unknown error occurred'
       console.error('Checkout session error:', errorMsg)

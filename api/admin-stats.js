@@ -81,13 +81,12 @@ export default async function handler(req, res) {
   }
 
   const supabaseUrl = process.env.SUPABASE_URL
-  const anonKey = process.env.SUPABASE_ANON_KEY
   const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY
 
-  if (!supabaseUrl || !anonKey || !serviceKey) {
-    console.error('admin-stats: missing SUPABASE_URL, SUPABASE_ANON_KEY, or SUPABASE_SERVICE_ROLE_KEY')
+  if (!supabaseUrl || !serviceKey) {
+    console.error('admin-stats: missing SUPABASE_URL or SUPABASE_SERVICE_ROLE_KEY')
     return res.status(500).json({
-      error: 'Server configuration error. Set SUPABASE_URL, SUPABASE_ANON_KEY, SUPABASE_SERVICE_ROLE_KEY on Vercel.',
+      error: 'Server configuration error. Set SUPABASE_URL and SUPABASE_SERVICE_ROLE_KEY on Vercel.',
     })
   }
 
@@ -103,11 +102,15 @@ export default async function handler(req, res) {
     return res.status(401).json({ error: 'Missing or invalid Authorization header' })
   }
 
-  const supabaseAuth = createClient(supabaseUrl, anonKey)
+  // Service role client can validate a user JWT via getUser(jwt) — no SUPABASE_ANON_KEY needed on Vercel
+  const admin = createClient(supabaseUrl, serviceKey, {
+    auth: { autoRefreshToken: false, persistSession: false },
+  })
+
   const {
     data: { user },
     error: userErr,
-  } = await supabaseAuth.auth.getUser(token)
+  } = await admin.auth.getUser(token)
 
   if (userErr || !user?.email) {
     return res.status(401).json({ error: 'Invalid or expired session' })
@@ -116,10 +119,6 @@ export default async function handler(req, res) {
   if (!adminEmails.includes(user.email.toLowerCase())) {
     return res.status(403).json({ error: 'Access denied' })
   }
-
-  const admin = createClient(supabaseUrl, serviceKey, {
-    auth: { autoRefreshToken: false, persistSession: false },
-  })
 
   const { data: purchases, error: purErr } = await admin
     .from('purchases')

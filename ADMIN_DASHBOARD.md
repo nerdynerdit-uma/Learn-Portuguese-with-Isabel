@@ -8,10 +8,9 @@ Add these in **Vercel** → Project → **Settings** → **Environment Variables
 
 | Variable | Description |
 |----------|-------------|
-| `ADMIN_EMAILS` | Comma-separated list of admin emails (e.g. `owner@example.com`). Only these accounts can load stats. |
-| `SUPABASE_ANON_KEY` | Supabase **anon** / **public** API key (same as in `supabase-config.js`). Used only to validate the user’s JWT. |
-| `SUPABASE_URL` | Already set for payments. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Already set. Used server-side to read all purchases and list users. |
+| `ADMIN_EMAILS` | Comma-separated list of admin emails (e.g. `owner@example.com`). Only these accounts can load stats. **Required.** |
+| `SUPABASE_URL` | Same as for payments. |
+| `SUPABASE_SERVICE_ROLE_KEY` | Same as for payments. Used to validate your JWT and read purchases/users. **No separate anon key needed.** |
 
 Redeploy after adding or changing variables.
 

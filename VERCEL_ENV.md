@@ -8,9 +8,8 @@ In **Vercel Dashboard** → your project → **Settings** → **Environment Vari
 | `VITE_STRIPE_PUBLISHABLE_KEY` | Stripe **publishable** key (live: `pk_live_...`). Same account as `STRIPE_SECRET_KEY`. Injected at build time. Checkout uses the server-returned **session URL** for redirect (no key mismatch); this key is still used if a fallback path runs. |
 | `STRIPE_WEBHOOK_SECRET` | From Stripe Dashboard → Developers → Webhooks. Add endpoint URL: `https://learnportuguesewithisabel.com/api/webhook` (use the **Signing secret** from that endpoint after you switch Stripe accounts). |
 | `SUPABASE_URL` | **Must be exactly** your Supabase project URL (e.g. `https://xxxxx.supabase.co`). Same project as in `supabase-config.js`. Get from Supabase → Settings → API → Project URL. |
-| `SUPABASE_SERVICE_ROLE_KEY` | Supabase **service_role** key (not anon). Supabase → Settings → API → Project API keys → `service_role` (secret). |
-| `SUPABASE_ANON_KEY` | Supabase **anon** / **public** key (same value as in `supabase-config.js`). Required for **`/api/admin-stats`** to validate the signed-in user. |
-| `ADMIN_EMAILS` | Comma-separated admin emails allowed to open **`/admin.html`** (e.g. `learnportuguesewithisabel@gmail.com`). |
+| `SUPABASE_SERVICE_ROLE_KEY` | Supabase **service_role** key (not anon). Supabase → Settings → API → Project API keys → `service_role` (secret). Used by admin API to validate your session and read data. |
+| `ADMIN_EMAILS` | Comma-separated admin emails allowed to open **`/admin.html`** (e.g. `learnportuguesewithisabel@gmail.com`). **Required** or the admin API returns a configuration error. |
 | `EMAIL_USER` | Gmail address (for contact form) |
 | `EMAIL_PASSWORD` | Gmail App Password (for contact form) |
 

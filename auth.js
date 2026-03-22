@@ -1,6 +1,16 @@
 // Authentication utilities using Supabase
 import { supabase } from './supabase-config.js'
 
+// Same-origin API on Vercel; localhost uses origin (use `vercel dev` for /api locally).
+function getApiBaseForAuth() {
+  if (typeof window === 'undefined') return ''
+  const isLocal = window.location.hostname === 'localhost' || window.location.hostname === '127.0.0.1'
+  return isLocal ? 'http://localhost:3000' : window.location.origin
+}
+
+// Gmail often drops Supabase SMTP when "from" and "to" are the same address — use server fallback.
+const PASSWORD_RESET_VIA_SERVER_EMAILS = ['learnportuguesewithisabel@gmail.com']
+
 export class AuthService {
   // Sign up new user
   static async signUp(email, password, fullName) {
@@ -118,8 +128,32 @@ export class AuthService {
     try {
       const normalizedEmail = typeof email === 'string' ? email.trim().toLowerCase() : email
       console.log('Sending password reset email to:', normalizedEmail)
+
+      const redirectTo = `${window.location.origin}/reset-password.html`
+
+      if (PASSWORD_RESET_VIA_SERVER_EMAILS.includes(normalizedEmail)) {
+        const base = getApiBaseForAuth()
+        const response = await fetch(`${base}/api/send-recovery-email`, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ email: normalizedEmail, redirectTo }),
+        })
+        const payload = await response.json().catch(() => ({}))
+        if (!response.ok) {
+          const msg = payload.error || `Server error (${response.status})`
+          return {
+            success: false,
+            error: msg,
+            errorStatus: response.status,
+            originalError: new Error(msg),
+          }
+        }
+        console.log('Password reset email sent via server fallback')
+        return { success: true }
+      }
+
       const { error } = await supabase.auth.resetPasswordForEmail(normalizedEmail, {
-        redirectTo: `${window.location.origin}/reset-password.html`
+        redirectTo,
       })
       if (error) {
         console.error('Password reset error:', error)

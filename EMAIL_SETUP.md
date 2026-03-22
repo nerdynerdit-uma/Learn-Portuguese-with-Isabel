@@ -1,5 +1,13 @@
 # Email Setup Guide for Supabase
 
+## Owner account (`learnportuguesewithisabel@gmail.com`) — password reset
+
+If password reset works for **other** addresses but **not** for the same Gmail you use as **SMTP sender**, Gmail often filters “mail to self.” This project uses **`/api/send-recovery-email`** on Vercel for that address: it builds a recovery link with Supabase Admin and sends it with **Nodemailer** (`EMAIL_USER` / `EMAIL_PASSWORD` on Vercel), same as the contact form.
+
+Optional env: **`RECOVERY_FALLBACK_EMAILS`** — comma-separated list of addresses that use this path (default: owner email only).
+
+---
+
 ## "Error sending recovery email" on Forgot Password
 
 This message means **Supabase’s default email service failed**. It does not send to all addresses and is rate-limited. You must configure **Custom SMTP** so password reset (and optional confirmation) emails work.

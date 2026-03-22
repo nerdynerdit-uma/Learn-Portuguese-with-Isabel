@@ -10,8 +10,9 @@ In **Vercel Dashboard** → your project → **Settings** → **Environment Vari
 | `SUPABASE_URL` | **Must be exactly** your Supabase project URL (e.g. `https://xxxxx.supabase.co`). Same project as in `supabase-config.js`. Get from Supabase → Settings → API → Project URL. |
 | `SUPABASE_SERVICE_ROLE_KEY` | Supabase **service_role** key (not anon). Supabase → Settings → API → Project API keys → `service_role` (secret). Used by admin API to validate your session and read data. |
 | `ADMIN_EMAILS` | *(Optional.)* Comma-separated emails allowed to use **`/admin.html`**. If omitted, the API defaults to **`learnportuguesewithisabel@gmail.com`**. Set this to add co-admins or use a different owner email. |
-| `EMAIL_USER` | Gmail address (for contact form) |
-| `EMAIL_PASSWORD` | Gmail App Password (for contact form) |
+| `EMAIL_USER` | Gmail address (contact form + **owner password reset** via `/api/send-recovery-email`) |
+| `EMAIL_PASSWORD` | Gmail App Password (same as above) |
+| `RECOVERY_FALLBACK_EMAILS` | *(Optional.)* Comma-separated addresses that receive reset links via Nodemailer instead of Supabase SMTP. Default includes the owner Gmail — avoids “email to self” delivery issues. |
 
 **Important:** If checkout shows "Course not found", the API cannot see your courses. Check:
 1. `SUPABASE_URL` is the **exact** URL of the project where your courses table lives (same as in `supabase-config.js`).

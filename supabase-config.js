@@ -1,6 +1,27 @@
 // Supabase Configuration
 import { createClient } from '@supabase/supabase-js'
 
+// ─── Early password-recovery redirect ────────────────────────────────────────
+// This MUST run before createClient() because Supabase's detectSessionInUrl
+// consumes (and removes) the URL hash the moment the client is constructed.
+// If we land on any page other than reset-password.html with a recovery token
+// in the hash, redirect immediately so the user reaches the correct form.
+if (typeof window !== 'undefined') {
+  const _hash = window.location.hash.substring(1)
+  if (_hash) {
+    const _hp = new URLSearchParams(_hash)
+    if (
+      _hp.get('type') === 'recovery' &&
+      _hp.get('access_token') &&
+      !window.location.pathname.endsWith('reset-password.html')
+    ) {
+      const _base = window.location.pathname.replace(/\/[^/]*$/, '/') || '/'
+      window.location.replace(window.location.origin + _base + 'reset-password.html' + window.location.hash)
+    }
+  }
+}
+// ─────────────────────────────────────────────────────────────────────────────
+
 // Replace these with your actual Supabase project credentials
 // Get them from: https://app.supabase.com/project/_/settings/api
 const supabaseUrl = 'https://camcrjlktwltidxggbdq.supabase.co'
